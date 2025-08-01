@@ -1,110 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Exclusive Toggle Buttons</title>
-  <style>
-    body {
-      background: #111;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      font-family: sans-serif;
-    }
-
-    .buttons-row {
-      display: flex;
-      gap: 16px;
-    }
-
-    .button-container {
-      display: inline-block;
-      position: relative;
-      cursor: pointer;
-    }
-
-    .toggle-button {
-      display: flex;
-      align-items: center;
-      width: 40px;
-      height: 40px;
-      background-color: black;
-      border: 2px solid #14FF8E;
-      border-radius: 50%;
-      overflow: hidden;
-      transition:
-        width 0.4s ease,
-        border-radius 0.4s ease,
-        padding 0.4s ease,
-        justify-content 0.4s ease;
-      white-space: nowrap;
-    }
-
-    .toggle-button img {
-      width: 32px;
-      height: 32px;
-      margin-left: 4px;
-      transition: transform 0.3s ease;
-    }
-
-    .button-label {
-      color: #14FF8E;
-      font-size: 14px;
-      margin-left: 10px;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-
-    /* Active state */
-    .button-container.active .toggle-button {
-      width: 150px;
-      border-radius: 20px;
-      justify-content: flex-start;
-      padding-left: 4px;
-    }
-
-    .button-container.active .button-label {
-      opacity: 1;
-    }
-  </style>
+<title>My WebView Page</title>
 </head>
 <body>
 
-  <div class="buttons-row">
-    <div class="button-container active" onclick="setActive(this)" ontouchstart="setActive(this)">
-      <div class="toggle-button">
-        <img src="C:/Users/agwan/Desktop/footy images/EFC.png" alt="icon" />
-        <span class="button-label">Button 1</span>
-      </div>
-    </div>
+<button id="myButton">Click me!</button>
 
-    <div class="button-container" onclick="setActive(this)" ontouchstart="setActive(this)">
-      <div class="toggle-button">
-        <img src="C:/Users/agwan/Desktop/footy images/LCF.png" alt="icon" />
-        <span class="button-label">Button 2</span>
-      </div>
-    </div>
-
-    <div class="button-container" onclick="setActive(this)" ontouchstart="setActive(this)">
-      <div class="toggle-button">
-        <img src="C:/Users/agwan/Desktop/footy images/GAL.png" alt="icon" />
-        <span class="button-label">Button 3</span>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    function setActive(clickedButton) {
-      const buttons = document.querySelectorAll('.button-container');
-      buttons.forEach(btn => {
-        btn.classList.remove('active');
-      });
-      clickedButton.classList.add('active');
+<script>
+document.getElementById('myButton').addEventListener('click', function() {
+  window.postMessage({
+    target: '01K0EK8WF91Y58DKB90HM9YGHN',
+    action: 'navigateTo',
+    payload: {
+      pageId: '01K1JRJHDAFYXPC4CP2Z0J2YNE'
     }
-  </script>
+  });
+});
+</script>
 
 </body>
 </html>
