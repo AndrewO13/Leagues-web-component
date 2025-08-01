@@ -2,6 +2,7 @@
 <html>
 <head>
 <title>My WebView Page</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   body {
     display: flex;
@@ -10,12 +11,37 @@
     height: 100vh;
     margin: 0;
     font-family: sans-serif;
+    box-sizing: border-box; /* A good practice to include */
+    padding: 20px; /* Add some padding to prevent the button from touching the screen edges */
+  }
+
+  #myButton {
+    /* Use relative units for better responsiveness */
+    padding: 1.2em 2.4em; /* Adjusts padding relative to font size */
+    font-size: 1.5em; /* Adjusts font size relative to the root font size */
+    width: 100%; /* Makes the button full width on smaller screens */
+    max-width: 400px; /* Limits the button's width on larger screens */
+    cursor: pointer;
+    border: none;
+    background-color: #007bff; /* A nice, standard blue for a button */
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: background-color 0.3s ease; /* Adds a smooth transition for hover effect */
   }
   
-  #myButton {
-    padding: 20px 40px;
-    font-size: 24px;
-    cursor: pointer;
+  #myButton:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+  }
+
+  /* Media query to adjust button size on larger screens */
+  @media (min-width: 600px) {
+    #myButton {
+      padding: 1.5em 3em;
+      font-size: 2em;
+    }
   }
 </style>
 </head>
