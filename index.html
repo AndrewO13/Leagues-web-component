@@ -20,10 +20,18 @@
       width: 1000px;
       height: 600px;
     }
-    .pitch {
+    .pitch-background {
       position: absolute;
       width: 100%;
       height: 100%;
+      z-index: 1;
+    }
+    .pitch {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      bottom: -60px;
     }
     .jersey-wrapper {
       position: absolute;
@@ -35,6 +43,7 @@
     .jersey {
       position: relative;
       width: 100px;
+      z-index: 5;
       height: auto;
       cursor: grab;
     }
@@ -153,6 +162,7 @@
 </head>
 <body>
   <div class="container">
+    <img src="pitch background.svg" alt="Pitch Background" class="pitch-background">
     <img src="pitch.svg" alt="Soccer Pitch" class="pitch">
     <div class="jersey-wrapper">
       <img src="Jersey.svg" alt="Jersey" class="jersey" draggable="false">
