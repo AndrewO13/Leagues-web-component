@@ -68,6 +68,26 @@
       align-items: center;
       justify-content: center;
     }
+    @media (max-width: 900px) {
+      .container {
+        width: 98vw;
+        height: 70vw;
+        max-width: 100vw;
+        max-height: 80vh;
+      }
+      .jersey {
+        width: 16vw;
+        min-width: 60px;
+      }
+      .popup-content {
+        padding: 8px;
+      }
+      .close-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 28px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -87,35 +107,79 @@
 
     let isDragging = false;
     let offsetX, offsetY;
+    let dragStartX, dragStartY;
+    let moved = false;
+    const DRAG_THRESHOLD = 10; // px
 
+    // Mouse events
     jersey.addEventListener('mousedown', (e) => {
       isDragging = true;
       offsetX = e.offsetX;
       offsetY = e.offsetY;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      moved = false;
       jersey.style.cursor = 'grabbing';
     });
 
     document.addEventListener('mousemove', (e) => {
       if (isDragging) {
+        const dx = e.clientX - dragStartX;
+        const dy = e.clientY - dragStartY;
+        if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
+          moved = true;
+        }
         const containerRect = document.querySelector('.container').getBoundingClientRect();
         const jerseyWidth = jersey.offsetWidth;
         const jerseyHeight = jersey.offsetHeight;
-
         let x = e.clientX - containerRect.left - offsetX;
         let y = e.clientY - containerRect.top - offsetY;
-
-        // Boundaries
         x = Math.max(0, Math.min(x, containerRect.width - jerseyWidth));
         y = Math.max(0, Math.min(y, containerRect.height - jerseyHeight));
-
         jersey.style.left = `${x}px`;
         jersey.style.top = `${y}px`;
       }
     });
 
-    document.addEventListener('mouseup', () => {
+    document.addEventListener('mouseup', (e) => {
       isDragging = false;
       jersey.style.cursor = 'grab';
+    });
+
+    // Touch events for mobile
+    jersey.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      const touch = e.touches[0];
+      const rect = jersey.getBoundingClientRect();
+      offsetX = touch.clientX - rect.left;
+      offsetY = touch.clientY - rect.top;
+      dragStartX = touch.clientX;
+      dragStartY = touch.clientY;
+      moved = false;
+    });
+
+    document.addEventListener('touchmove', (e) => {
+      if (isDragging) {
+        const touch = e.touches[0];
+        const dx = touch.clientX - dragStartX;
+        const dy = touch.clientY - dragStartY;
+        if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
+          moved = true;
+        }
+        const containerRect = document.querySelector('.container').getBoundingClientRect();
+        const jerseyWidth = jersey.offsetWidth;
+        const jerseyHeight = jersey.offsetHeight;
+        let x = touch.clientX - containerRect.left - offsetX;
+        let y = touch.clientY - containerRect.top - offsetY;
+        x = Math.max(0, Math.min(x, containerRect.width - jerseyWidth));
+        y = Math.max(0, Math.min(y, containerRect.height - jerseyHeight));
+        jersey.style.left = `${x}px`;
+        jersey.style.top = `${y}px`;
+      }
+    }, { passive: false });
+
+    document.addEventListener('touchend', (e) => {
+      isDragging = false;
     });
 
     // Set initial position
@@ -128,13 +192,24 @@
 
     jersey.addEventListener('click', (e) => {
       // Prevent click from triggering drag
-      if (!isDragging) {
+      if (!isDragging && !moved) {
+        popup.style.display = 'flex';
+      }
+    });
+    // For mobile: tap detection
+    jersey.addEventListener('touchend', (e) => {
+      if (!moved) {
         popup.style.display = 'flex';
       }
     });
 
     closeBtn.addEventListener('click', () => {
       popup.style.display = 'none';
+    });
+    // Also close popup on touch for mobile
+    closeBtn.addEventListener('touchend', (e) => {
+      popup.style.display = 'none';
+      e.preventDefault();
     });
   </script>
 </body>
