@@ -138,6 +138,15 @@
       box-shadow: 0 0 0 2px #FF0000 inset;
       color: #FF0000;
     }
+    .bench {
+      position: absolute;
+      left: 0;
+      bottom: 42.5px;
+      width: 100%;
+      height: auto;
+      z-index: 1;
+      pointer-events: none;
+    }
     @media (max-width: 900px) {
       .container {
         width: 100vw;
@@ -163,6 +172,7 @@
 <body>
   <div class="container">
     <img src="pitch background.svg" alt="Pitch Background" class="pitch-background">
+    <img src="bench.svg" alt="Bench" class="bench">
     <img src="pitch.svg" alt="Soccer Pitch" class="pitch">
     <div class="jersey-wrapper">
       <img src="Jersey.svg" alt="Jersey" class="jersey" draggable="false">
