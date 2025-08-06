@@ -97,7 +97,8 @@
   </div>
   <div class="popup" id="editPlayerPopup">
     <div class="popup-content">
-      <img src="edit player.svg" alt="Edit Player" id="editPlayerImg" style="width:300px;max-width:80vw;max-height:80vh;">
+      <button class="close-btn" id="closePopupBtn">&times;</button>
+      <img src="edit player.svg" alt="Edit Player" style="width:300px;max-width:80vw;max-height:80vh;">
     </div>
   </div>
 
@@ -189,38 +190,28 @@
 
     // Popup logic
     const popup = document.getElementById('editPlayerPopup');
-    // Remove closeBtn logic, use SVG's close button
-    // Listen for click/tap on the top-left area of the SVG to close
-    const editPlayerImg = document.getElementById('editPlayerImg');
-    // Coordinates for the close button area (adjust as needed)
-    const CLOSE_BTN_AREA = { x: 0, y: 0, width: 60, height: 60 };
+    const closeBtn = document.getElementById('closePopupBtn');
 
-    function isInCloseArea(img, event) {
-      let rect = img.getBoundingClientRect();
-      let x, y;
-      if (event.touches && event.touches.length > 0) {
-        x = event.touches[0].clientX - rect.left;
-        y = event.touches[0].clientY - rect.top;
-      } else {
-        x = event.clientX - rect.left;
-        y = event.clientY - rect.top;
+    jersey.addEventListener('click', (e) => {
+      // Prevent click from triggering drag
+      if (!isDragging && !moved) {
+        popup.style.display = 'flex';
       }
-      return x >= CLOSE_BTN_AREA.x && x <= CLOSE_BTN_AREA.x + CLOSE_BTN_AREA.width &&
-             y >= CLOSE_BTN_AREA.y && y <= CLOSE_BTN_AREA.y + CLOSE_BTN_AREA.height;
-    }
+    });
+    // For mobile: tap detection
+    jersey.addEventListener('touchend', (e) => {
+      if (!moved) {
+        popup.style.display = 'flex';
+      }
+    });
 
-    function tryClosePopup(e) {
-      if (isInCloseArea(editPlayerImg, e)) {
-        popup.style.display = 'none';
-      }
-    }
-
-    editPlayerImg.addEventListener('click', tryClosePopup);
-    editPlayerImg.addEventListener('touchend', function(e) {
-      if (isInCloseArea(editPlayerImg, e)) {
-        popup.style.display = 'none';
-        e.preventDefault();
-      }
+    closeBtn.addEventListener('click', () => {
+      popup.style.display = 'none';
+    });
+    // Also close popup on touch for mobile
+    closeBtn.addEventListener('touchend', (e) => {
+      popup.style.display = 'none';
+      e.preventDefault();
     });
   </script>
 </body>
