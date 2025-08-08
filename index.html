@@ -53,7 +53,7 @@
       font-size: 12px;
       color: black;
       text-align: center;
-      margin-top: -22px;
+      margin-top: -16px;
       font-weight: 700;
       z-index: 10;
       position: relative;
@@ -247,14 +247,10 @@
       left: 124px;
       top: 40px;
       z-index: 15;
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 8px;
     }
     .player-image-jersey {
       position: absolute;
-      left: 27.5px;
+      left: 21px;
       top: 5.5px;
       width: 17.58px;
       height: 27.64px;
@@ -264,7 +260,7 @@
     }
     .collar-jersey {
       position: absolute;
-      left: 28px;
+      left: 22px;
       top: 25px;
       z-index: 12;
       pointer-events: none;
@@ -272,7 +268,7 @@
     .player-name {
       position: absolute;
       left: 150px;
-      top: 190px;
+      top: 183px;
       font-family: 'Quicksand', Arial, sans-serif;
       font-size: 16px;
       color: #082D27;
@@ -358,8 +354,8 @@
         jerseyWrapper.dataset.playerId = player.id;
         
         // Set initial position (scattered across the pitch)
-        const baseX = 100 + (index % 4) * 150; // 4 columns
-        const baseY = 100 + Math.floor(index / 4) * 120; // Rows
+        const baseX = 50 + (index % 6) * 48; // 4 columns
+        const baseY = 200 + Math.floor(index / 6) * 48; // Rows
         jerseyWrapper.style.left = `${baseX}px`;
         jerseyWrapper.style.top = `${baseY}px`;
 
@@ -387,7 +383,9 @@
         // Create player text
         const playerText = document.createElement('div');
         playerText.className = 'player-text';
-        playerText.textContent = player.Player_Name || 'Player';
+        const fullName = player.Player_Name || 'Player';
+        const firstName = fullName.split(' ')[0]; // Get only the first name
+        playerText.textContent = firstName;
 
         // Add elements to wrapper
         jerseyWrapper.appendChild(jerseyImg);
