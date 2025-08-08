@@ -248,6 +248,23 @@
       top: 40px;
       z-index: 15;
     }
+    .player-image-jersey {
+      position: absolute;
+      left: 21px;
+      top: 5.5px;
+      width: 17.58px;
+      height: 27.64px;
+      border-radius: 50px;
+      z-index: 11;
+      pointer-events: none;
+    }
+    .collar-jersey {
+      position: absolute;
+      left: 22px;
+      top: 25px;
+      z-index: 12;
+      pointer-events: none;
+    }
     .player-name {
       position: absolute;
       left: 150px;
@@ -349,6 +366,20 @@
         jerseyImg.className = 'jersey';
         jerseyImg.draggable = false;
 
+        // Create player image
+        const playerImage = document.createElement('img');
+        playerImage.src = 'Player image.png';
+        playerImage.alt = 'Player Image';
+        playerImage.className = 'player-image-jersey';
+        playerImage.draggable = false;
+
+        // Create collar
+        const collar = document.createElement('img');
+        collar.src = 'Collar.svg';
+        collar.alt = 'Collar';
+        collar.className = 'collar-jersey';
+        collar.draggable = false;
+
         // Create player text
         const playerText = document.createElement('div');
         playerText.className = 'player-text';
@@ -356,6 +387,8 @@
 
         // Add elements to wrapper
         jerseyWrapper.appendChild(jerseyImg);
+        jerseyWrapper.appendChild(playerImage);
+        jerseyWrapper.appendChild(collar);
         jerseyWrapper.appendChild(playerText);
 
         // Add to container
