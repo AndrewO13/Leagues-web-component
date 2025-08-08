@@ -39,6 +39,7 @@
       flex-direction: column;
       align-items: center;
       cursor: grab;
+      z-index: 10;
     }
     .jersey {
       position: relative;
@@ -276,9 +277,8 @@
     <img src="pitch background.svg" alt="Pitch Background" class="pitch-background">
     <img src="bench.svg" alt="Bench" class="bench">
     <img src="pitch.svg" alt="Soccer Pitch" class="pitch">
-    <div class="jersey-wrapper">
-      <img src="Jersey.svg" alt="Jersey" class="jersey" draggable="false">
-      <div class="player-text">Player</div>
+    <div id="players-container">
+      <!-- Player jerseys will be dynamically created here -->
     </div>
   </div>
   <div class="popup" id="editPlayerPopup">
@@ -310,9 +310,8 @@
   </div>
 
   <script>
-    const jersey = document.querySelector('.jersey-wrapper');
     let players = []; // Store all players data
-    let currentPlayerId = null; // Track current player
+    let currentPlayerId = null; // Track current player for popup
 
     // Fetch all players on page load
     async function fetchPlayers() {
@@ -320,17 +319,152 @@
         const response = await fetch('https://x8ki-letl-twmt.n7.xano.io/api:T4NTZwY4/players');
         players = await response.json();
         console.log('Players loaded:', players);
+        createPlayerJerseys();
       } catch (error) {
         console.error('Error fetching players:', error);
       }
     }
 
-    // Update jersey with player data
-    function updateJerseyWithPlayer(playerData) {
-      const playerText = document.querySelector('.player-text');
-      if (playerData && playerData.Player_Name) {
-        playerText.textContent = playerData.Player_Name;
-      }
+    // Create jersey wrappers for all players
+    function createPlayerJerseys() {
+      const playersContainer = document.getElementById('players-container');
+      playersContainer.innerHTML = ''; // Clear existing content
+
+      players.forEach((player, index) => {
+        // Create jersey wrapper
+        const jerseyWrapper = document.createElement('div');
+        jerseyWrapper.className = 'jersey-wrapper';
+        jerseyWrapper.dataset.playerId = player.id;
+        
+        // Set initial position (scattered across the pitch)
+        const baseX = 100 + (index % 4) * 150; // 4 columns
+        const baseY = 100 + Math.floor(index / 4) * 120; // Rows
+        jerseyWrapper.style.left = `${baseX}px`;
+        jerseyWrapper.style.top = `${baseY}px`;
+
+        // Create jersey image
+        const jerseyImg = document.createElement('img');
+        jerseyImg.src = 'Jersey.svg';
+        jerseyImg.alt = 'Jersey';
+        jerseyImg.className = 'jersey';
+        jerseyImg.draggable = false;
+
+        // Create player text
+        const playerText = document.createElement('div');
+        playerText.className = 'player-text';
+        playerText.textContent = player.Player_Name || 'Player';
+
+        // Add elements to wrapper
+        jerseyWrapper.appendChild(jerseyImg);
+        jerseyWrapper.appendChild(playerText);
+
+        // Add to container
+        playersContainer.appendChild(jerseyWrapper);
+
+        // Add drag functionality to this jersey
+        addDragFunctionality(jerseyWrapper);
+      });
+    }
+
+    // Add drag functionality to a jersey wrapper
+    function addDragFunctionality(jerseyWrapper) {
+      let isDragging = false;
+      let offsetX, offsetY;
+      let dragStartX, dragStartY;
+      let moved = false;
+      const DRAG_THRESHOLD = 10;
+
+      // Mouse events
+      jerseyWrapper.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        offsetX = e.offsetX;
+        offsetY = e.offsetY;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        moved = false;
+        jerseyWrapper.style.cursor = 'grabbing';
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+          const dx = e.clientX - dragStartX;
+          const dy = e.clientY - dragStartY;
+          if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
+            moved = true;
+          }
+          const containerRect = document.querySelector('.container').getBoundingClientRect();
+          const jerseyWidth = jerseyWrapper.offsetWidth;
+          const jerseyHeight = jerseyWrapper.offsetHeight;
+          let x = e.clientX - containerRect.left - offsetX;
+          let y = e.clientY - containerRect.top - offsetY;
+          x = Math.max(0, Math.min(x, containerRect.width - jerseyWidth));
+          y = Math.max(0, Math.min(y, containerRect.height - jerseyHeight));
+          jerseyWrapper.style.left = `${x}px`;
+          jerseyWrapper.style.top = `${y}px`;
+        }
+      });
+
+      document.addEventListener('mouseup', (e) => {
+        isDragging = false;
+        jerseyWrapper.style.cursor = 'grab';
+      });
+
+      // Touch events for mobile
+      jerseyWrapper.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        isDragging = true;
+        const touch = e.touches[0];
+        const rect = jerseyWrapper.getBoundingClientRect();
+        offsetX = touch.clientX - rect.left;
+        offsetY = touch.clientY - rect.top;
+        dragStartX = touch.clientX;
+        dragStartY = touch.clientY;
+        moved = false;
+      });
+
+      jerseyWrapper.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        if (isDragging) {
+          const touch = e.touches[0];
+          const dx = touch.clientX - dragStartX;
+          const dy = touch.clientY - dragStartY;
+          if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
+            moved = true;
+          }
+          const containerRect = document.querySelector('.container').getBoundingClientRect();
+          const jerseyWidth = jerseyWrapper.offsetWidth;
+          const jerseyHeight = jerseyWrapper.offsetHeight;
+          let x = touch.clientX - containerRect.left - offsetX;
+          let y = touch.clientY - containerRect.top - offsetY;
+          x = Math.max(0, Math.min(x, containerRect.width - jerseyWidth));
+          y = Math.max(0, Math.min(y, containerRect.height - jerseyHeight));
+          jerseyWrapper.style.left = `${x}px`;
+          jerseyWrapper.style.top = `${y}px`;
+        }
+      }, { passive: false });
+
+      document.addEventListener('touchend', (e) => {
+        isDragging = false;
+      });
+
+      // Click event for popup
+      jerseyWrapper.addEventListener('click', (e) => {
+        if (!isDragging && !moved) {
+          const playerId = jerseyWrapper.dataset.playerId;
+          currentPlayerId = playerId;
+          popup.style.display = 'flex';
+          updatePopupWithPlayer(playerId);
+        }
+      });
+
+      jerseyWrapper.addEventListener('touchend', (e) => {
+        if (!moved) {
+          const playerId = jerseyWrapper.dataset.playerId;
+          currentPlayerId = playerId;
+          popup.style.display = 'flex';
+          updatePopupWithPlayer(playerId);
+        }
+      });
     }
 
     // Update popup with player data
@@ -357,131 +491,17 @@
       }
     }
 
-    // Initialize with first player (for demo purposes)
-    async function initializeWithFirstPlayer() {
-      await fetchPlayers();
-      if (players.length > 0) {
-        const firstPlayer = players[0];
-        currentPlayerId = firstPlayer.id;
-        updateJerseyWithPlayer(firstPlayer);
-      }
-    }
-
-    // Call initialization
-    initializeWithFirstPlayer();
-
-    let isDragging = false;
-    let offsetX, offsetY;
-    let dragStartX, dragStartY;
-    let moved = false;
-    const DRAG_THRESHOLD = 10; // px
-
-    // Mouse events
-    jersey.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      offsetX = e.offsetX;
-      offsetY = e.offsetY;
-      dragStartX = e.clientX;
-      dragStartY = e.clientY;
-      moved = false;
-      jersey.style.cursor = 'grabbing';
-    });
-
-    document.addEventListener('mousemove', (e) => {
-      if (isDragging) {
-        const dx = e.clientX - dragStartX;
-        const dy = e.clientY - dragStartY;
-        if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
-          moved = true;
-        }
-        const containerRect = document.querySelector('.container').getBoundingClientRect();
-        const jerseyWidth = jersey.offsetWidth;
-        const jerseyHeight = jersey.offsetHeight;
-        let x = e.clientX - containerRect.left - offsetX;
-        let y = e.clientY - containerRect.top - offsetY;
-        x = Math.max(0, Math.min(x, containerRect.width - jerseyWidth));
-        y = Math.max(0, Math.min(y, containerRect.height - jerseyHeight));
-        jersey.style.left = `${x}px`;
-        jersey.style.top = `${y}px`;
-      }
-    });
-
-    document.addEventListener('mouseup', (e) => {
-      isDragging = false;
-      jersey.style.cursor = 'grab';
-    });
-
-    // Touch events for mobile
-    jersey.addEventListener('touchstart', (e) => {
-      e.preventDefault(); // Prevent scrolling and default behavior
-      isDragging = true;
-      const touch = e.touches[0];
-      const rect = jersey.getBoundingClientRect();
-      offsetX = touch.clientX - rect.left;
-      offsetY = touch.clientY - rect.top;
-      dragStartX = touch.clientX;
-      dragStartY = touch.clientY;
-      moved = false;
-    });
-
-    jersey.addEventListener('touchmove', (e) => {
-      e.preventDefault(); // Prevent scrolling and default behavior
-      if (isDragging) {
-        const touch = e.touches[0];
-        const dx = touch.clientX - dragStartX;
-        const dy = touch.clientY - dragStartY;
-        if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
-          moved = true;
-        }
-        const containerRect = document.querySelector('.container').getBoundingClientRect();
-        const jerseyWidth = jersey.offsetWidth;
-        const jerseyHeight = jersey.offsetHeight;
-        let x = touch.clientX - containerRect.left - offsetX;
-        let y = touch.clientY - containerRect.top - offsetY;
-        x = Math.max(0, Math.min(x, containerRect.width - jerseyWidth));
-        y = Math.max(0, Math.min(y, containerRect.height - jerseyHeight));
-        jersey.style.left = `${x}px`;
-        jersey.style.top = `${y}px`;
-      }
-    }, { passive: false });
-
-    document.addEventListener('touchend', (e) => {
-      isDragging = false;
-    });
-
-    // Set initial position
-    jersey.style.left = '350px';
-    jersey.style.top = '250px';
+    // Initialize
+    fetchPlayers();
 
     // Popup logic
     const popup = document.getElementById('editPlayerPopup');
     const closeBtn = document.getElementById('closePopupBtn');
 
-    jersey.addEventListener('click', (e) => {
-      // Prevent click from triggering drag
-      if (!isDragging && !moved) {
-        popup.style.display = 'flex';
-        // Update popup with current player data
-        if (currentPlayerId) {
-          updatePopupWithPlayer(currentPlayerId);
-        }
-      }
-    });
-    // For mobile: tap detection
-    jersey.addEventListener('touchend', (e) => {
-      if (!moved) {
-        popup.style.display = 'flex';
-        // Update popup with current player data
-        if (currentPlayerId) {
-          updatePopupWithPlayer(currentPlayerId);
-        }
-      }
-    });
-
     closeBtn.addEventListener('click', () => {
       popup.style.display = 'none';
     });
-    // Also close popup on touch for mobile
+
     closeBtn.addEventListener('touchend', (e) => {
       popup.style.display = 'none';
       e.preventDefault();
