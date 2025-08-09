@@ -247,6 +247,10 @@
       left: 124px;
       top: 40px;
       z-index: 15;
+      width: 127.18px;
+      height: 143.54px;
+      object-fit: cover;
+      object-position: center;
     }
     .player-image-jersey {
       position: absolute;
@@ -518,6 +522,11 @@
         const playerPhotoElement = document.querySelector('.player-photo');
         if (playerData && playerData.Player_Photo && playerData.Player_Photo[0]) {
           playerPhotoElement.src = playerData.Player_Photo[0].url;
+          // Ensure the image fills the exact dimensions of the Player photo.png placeholder
+          playerPhotoElement.style.objectFit = 'cover';
+          playerPhotoElement.style.objectPosition = 'center';
+          playerPhotoElement.style.width = '127.18px';
+          playerPhotoElement.style.height = '143.54px';
         }
         
         console.log('Popup updated with player data:', playerData);
